@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pidoras</title>
+    <title>етдор</title>
     <style>
         body {
             background-color: black;
@@ -26,16 +26,24 @@
             min-height: 60vh;
             display: flex;
             flex-direction: column;
+            justify-content: flex-start;
         }
         #output {
             flex-grow: 1;
             white-space: pre-line;
             overflow-y: auto;
             margin-bottom: 10px;
+            padding: 20px;
+            border: 2px solid #00ff00;
+            background-color: rgba(0, 0, 0, 0.9);
+            margin-bottom: 20px;
+            height: 400px;
+            text-align: left; /* Выравнивание текста в рамке слева */
         }
         #input-line {
             display: flex;
             align-items: center;
+            justify-content: flex-start; /* Командная строка не в рамке */
         }
         #input-line span {
             color: #00ff00;
@@ -49,22 +57,32 @@
             font-size: 16px;
             outline: none;
             flex-grow: 1;
+            width: 100%;
+        }
+        a {
+            color: #00ff00;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div id="terminal">
         <div id="output">
-            Welcome to Assa's bio.
-            -----------------------------  
-            Available commands:  
-            - `about` → information about me  
-            - `links` → my social media  
-            - `clear` → clear the terminal  
-            -----------------------------  
+            <div id="welcome">
+                Welcome to Assa's Cyber Terminal  
+                -----------------------------  
+                Available commands:  
+                - `about` → information about me  
+                - `links` → my social media  
+                - `clear` → clear previous commands  
+                -----------------------------  
+            </div>
         </div>
         <div id="input-line">
-            <span>pidor@assa.lol:~$</span>
+            <span>user@assa.lol:~$</span>
             <input type="text" id="command-input" autofocus>
         </div>
     </div>
@@ -72,6 +90,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             const inputField = document.getElementById("command-input");
             const outputDiv = document.getElementById("output");
+            const welcomeText = document.getElementById("welcome").innerHTML;
 
             inputField.addEventListener("keypress", function (event) {
                 if (event.key === "Enter") {
@@ -90,10 +109,13 @@
                         response = "Name: Assa\nBirthdate: 30.06.2008 (17 y. o.)\nGender: Male (he/him)\nHobbies: anime, coding & sleep.";
                         break;
                     case "links":
-                        response = "Telegram: t.me/codermasochist\nTikTok: https://www.tiktok.com/@codermasochist\nDiscord: https://discord.gg/qwdYnvsc\nGitHub: https://GitHub.com/codermasochist";
+                        response = 'Telegram: <a href="https://t.me/codermasochist" target="_blank">t.me/codermasochist</a>\n' +
+                                   'TikTok: <a href="https://www.tiktok.com/@codermasochist" target="_blank">@codermasochist</a>\n' +
+                                   'Discord: <a href="https://discord.gg/qwdYnvsc" target="_blank">discord.gg/qwdYnvsc</a>\n' +
+                                   'GitHub: <a href="https://GitHub.com/codermasochist" target="_blank">GitHub.com/codermasochist</a>';
                         break;
                     case "clear":
-                        outputDiv.innerHTML = "";
+                        outputDiv.innerHTML = `<div id="welcome">${welcomeText}</div>`;
                         return;
                     default:
                         response = `Command not found: ${command}`;
