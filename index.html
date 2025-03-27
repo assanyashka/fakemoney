@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>етдор</title>
+    <title>Киберпанковский терминал</title>
     <style>
         body {
-            background-color: black;
+            background-color: #121212;
             color: #00ff00;
             font-family: monospace;
             font-size: 16px;
@@ -20,30 +20,30 @@
             width: 80%;
             max-width: 800px;
             padding: 20px;
-            border: 2px solid #00ff00;
-            background: rgba(0, 0, 0, 0.8);
-            box-shadow: 0 0 10px #00ff00;
-            min-height: 60vh;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            box-shadow: 0 0 10px #00ff00;
+            background: rgba(0, 0, 0, 0.9);
         }
         #output {
             flex-grow: 1;
             white-space: pre-line;
             overflow-y: auto;
-            margin-bottom: 10px;
             padding: 20px;
-            border: 2px solid #00ff00;
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: rgba(0, 0, 0, 0.8);
             margin-bottom: 20px;
+            text-align: center;
             height: 400px;
-            text-align: left; /* Выравнивание текста в рамке слева */
+            border: 2px solid #ff4081;
+            box-shadow: 0 0 10px #ff4081;
         }
         #input-line {
             display: flex;
             align-items: center;
-            justify-content: flex-start; /* Командная строка не в рамке */
+            justify-content: flex-start;
+            border: 2px solid #00ff00;
+            padding: 10px;
         }
         #input-line span {
             color: #00ff00;
@@ -56,11 +56,26 @@
             font-family: monospace;
             font-size: 16px;
             outline: none;
-            flex-grow: 1;
             width: 100%;
         }
+        #command-list {
+            position: absolute;
+            left: 10px;
+            top: 20px;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #ff4081;
+            border: 2px solid #ff4081;
+            padding: 10px;
+            width: 150px;
+            font-size: 14px;
+            text-align: left;
+            box-shadow: 0 0 10px #ff4081;
+        }
+        #command-list p {
+            margin: 5px 0;
+        }
         a {
-            color: #00ff00;
+            color: #ff4081;
             text-decoration: none;
         }
         a:hover {
@@ -70,14 +85,20 @@
 </head>
 <body>
     <div id="terminal">
+        <div id="command-list">
+            <p>Available Commands:</p>
+            <p><code>about</code> - Information about me</p>
+            <p><code>links</code> - My social media</p>
+            <p><code>clear</code> - Clear terminal</p>
+        </div>
         <div id="output">
             <div id="welcome">
                 Welcome to Assa's Cyber Terminal  
                 -----------------------------  
                 Available commands:  
-                - `about` → information about me  
-                - `links` → my social media  
-                - `clear` → clear previous commands  
+                - <code>about</code> → information about me  
+                - <code>links</code> → my social media  
+                - <code>clear</code> → clear previous commands  
                 -----------------------------  
             </div>
         </div>
@@ -103,6 +124,9 @@
 
             function processCommand(command) {
                 let response = "";
+
+                // Clear previous content
+                outputDiv.innerHTML = `<div id="welcome">${welcomeText}</div>`;
 
                 switch (command.toLowerCase()) {
                     case "about":
