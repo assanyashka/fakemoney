@@ -3,18 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Киберпанковский терминал</title>
-    <link rel="stylesheet" href="style.css">
+    <title>pidoras</title>
+    <style>
+        body {
+            background-color: black;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #terminal {
+            width: 80%;
+            max-width: 800px;
+            padding: 20px;
+            border: 2px solid #00ff00;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 10px #00ff00;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #output {
+            flex-grow: 1;
+            white-space: pre-line;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        #input-line {
+            display: flex;
+            align-items: center;
+        }
+        #input-line span {
+            color: #00ff00;
+            margin-right: 5px;
+        }
+        #command-input {
+            background: none;
+            border: none;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 16px;
+            outline: none;
+            flex-grow: 1;
+        }
+    </style>
 </head>
 <body>
     <div id="terminal">
-        <div id="output"></div>
+        <div id="output">
+            Welcome to Assa's bio.
+            -----------------------------  
+            Available commands:  
+            - `about` → information about me  
+            - `links` → my social media  
+            - `clear` → clear the terminal  
+            -----------------------------  
+        </div>
         <div id="input-line">
-            <span>user@assa.lol:~$</span>
+            <span>pidor@assa.lol:~$</span>
             <input type="text" id="command-input" autofocus>
         </div>
     </div>
-    <audio id="keypress-audio" src="keypress.mp3"></audio>
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const inputField = document.getElementById("command-input");
+            const outputDiv = document.getElementById("output");
+
+            inputField.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    let command = inputField.value.trim();
+                    inputField.value = "";
+                    processCommand(command);
+                }
+            });
+
+            function processCommand(command) {
+                let response = "";
+
+                switch (command.toLowerCase()) {
+                    case "about":
+                        response = "Name: Assa\nBirthdate: 30.06.2008 (17 y. o.)\nGender: Male (he/him)\nHobbies: anime, coding & sleep.";
+                        break;
+                    case "links":
+                        response = "Telegram: t.me/codermasochist\nTikTok: https://www.tiktok.com/@codermasochist\nDiscord: https://discord.gg/qwdYnvsc\nGitHub: https://GitHub.com/codermasochist";
+                        break;
+                    case "clear":
+                        outputDiv.innerHTML = "";
+                        return;
+                    default:
+                        response = `Command not found: ${command}`;
+                }
+
+                outputDiv.innerHTML += `\nuser@assa.lol:~$ ${command}\n${response}\n`;
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+            }
+        });
+    </script>
 </body>
 </html>
