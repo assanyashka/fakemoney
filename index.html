@@ -3,83 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assa Terminal</title>
+    <title>Assa | Personal Bio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+        /* Base styles */
+        :root {
+            --black: #000;
+            --white: #fff;
+            --red: #ff0000;
+            --dark-red: #b30000;
+            --dark-gray: #111;
+            --gray: #222;
+            --light-gray: #333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Consolas', monospace;
+        }
         
         body {
-            background-color: black;
-            color: green;
-            font-family: 'Fira Code', monospace;
-            font-size: 16px;
-            margin: 0;
-            padding: 10px;
+            background: linear-gradient(135deg, var(--black), var(--gray));
+            color: var(--white);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
-
-        #terminal {
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 0, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 0, 0.1) 0%, transparent 40%);
+            z-index: -1;
+        }
+        
+        /* Menu toggle */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .menu-line {
+            width: 100%;
+            height: 3px;
+            background: var(--white);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .menu-toggle.active .menu-line:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+        
+        .menu-toggle.active .menu-line:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .menu-toggle.active .menu-line:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            transition: right 0.4s ease;
+            border-left: 1px solid rgba(255, 0, 0, 0.3);
+            padding: 80px 30px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .sidebar.open {
+            right: 0;
+        }
+        
+        .sidebar a {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 1.2rem;
+            padding: 12px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar a:hover {
+            background: rgba(255, 0, 0, 0.2);
+            transform: translateX(-10px);
+        }
+        
+        .sidebar a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--red);
+            transform: translateX(-10px);
+            transition: transform 0.3s ease;
+            opacity: 0;
+        }
+        
+        .sidebar a:hover::before {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        /* Container */
+        .container {
             max-width: 800px;
-            margin: auto;
-            white-space: pre-wrap;
+            margin: 0 auto;
+            padding: 20px;
         }
-
-        #cmd {
-            background: none;
-            border: none;
-            color: green;
-            font-family: inherit;
-            font-size: inherit;
-            width: 80%;
-            outline: none;
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
         }
-
-        #prompt {
-            color: white;
+        
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--red);
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--red);
+        }
+        
+        /* Avatar */
+        .avatar-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .avatar-frame {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--red);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .avatar-frame:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--red);
+        }
+        
+        .avatar-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 60%, rgba(255, 0, 0, 0.3) 100%);
+        }
+        
+        .avatar-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Name */
+        .name {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.8rem;
+            line-height: 1.6;
+        }
+        
+        .name span {
+            color: var(--red);
+        }
+        
+        /* Aliases */
+        .aliases {
+            text-align: center;
+            margin: 30px 0;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .alias-container {
+            overflow: hidden;
+            height: 40px;
+            position: relative;
+        }
+        
+        .alias {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.4rem;
+            color: var(--red);
+            opacity: 0;
+            transition: all 0.8s ease;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        
+        .alias.active {
+            opacity: 1;
+        }
+        
+        /* Bio section */
+        .bio-section {
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bio-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--red);
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--red);
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        
+        .bio-content {
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .bio-content p {
+            margin: 10px 0;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: #aaa;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .avatar-frame {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .name {
+                font-size: 1.5rem;
+            }
+            
+            .alias {
+                font-size: 1.2rem;
+            }
+            
+            .bio-section {
+                padding: 20px;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .bio-content {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="terminal">
-        <pre id="output"></pre>
-        <span id="prompt">pidor@assa.lol:~$ </span><input type="text" id="cmd" autofocus>
+    <!-- Menu Toggle -->
+    <div class="menu-toggle">
+        <div class="menu-line"></div>
+        <div class="menu-line"></div>
+        <div class="menu-line"></div>
     </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/info"><i class="fas fa-user"></i> Info</a>
+        <a href="/donate"><i class="fas fa-donate"></i> Donate</a>
+        <a href="/links"><i class="fas fa-link"></i> Links</a>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Assa | info</h1>
+        </div>
+        
+        <!-- Visit Counter -->
+        <div style="display: flex; justify-content: center; margin: 20px 0;">
+            <img src="https://count.getloli.com/@assa?name=assa&theme=asoul&padding=7&offset=0&align=top&scale=1&pixelated=1&darkmode=auto" alt="Visitor Counter">
+        </div>
+        
+        <!-- Avatar -->
+        <div class="avatar-container">
+            <div class="avatar-frame">
+                <img src="https://t.me/i/userpic/160/codermasochist.jpg" alt="Assa's Avatar">
+            </div>
+        </div>
+        
+        <!-- Name -->
+        <div class="name">
+            Assa<br>
+            codermasochist<br>
+            <span>(he/him/any)</span>
+        </div>
+        
+        <!-- Aliases -->
+        <div class="aliases">
+            <div class="alias-container">
+                <div class="alias active">Assa</div>
+                <div class="alias">Аска</div>
+                <div class="alias">аса</div>
+                <div class="alias">кот за столом</div>
+                <div class="alias">codermasochist</div>
+                <div class="alias">dolbaeb</div>
+            </div>
+        </div>
+        
+        <!-- Bio Section -->
+        <div class="bio-section">
+            <h2 class="section-title">немного обо мне///</h2>
+            <div class="bio-content">
+                <p>Whoami: Assa.</p>
+                <p>Birthdate: 30.06.2008.</p>
+                <p>Age: <span id="age">17.041320</span> y. o.</p>
+                <p>Gender: Male.</p>
+                <p>Hobby: eat, anime, coding & sleep.</p>
+                <p>(the list will be updated...?)</p>
+                <p>pum pum pum.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        (c) codermasochist. All right reserved.
+    </div>
+    
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const input = document.getElementById("cmd");
-            const output = document.getElementById("output");
+        // Sidebar toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            sidebar.classList.toggle('open');
+        });
+        
+        // Rotating aliases
+        const aliases = document.querySelectorAll('.alias');
+        let currentIndex = 0;
+        
+        function rotateAlias() {
+            // Hide current
+            aliases[currentIndex].classList.remove('active');
             
-            const commands = {
-                "bio": `name: Assa\nbirthdate: 30.06.08 (17 y. o.)\nGender: male (he/him)\nHobby: anime, coding & sleep...\n\n` +
-                    `⠀⠀⠀⠀⢀⡴⠘⠁⠀⠀⠀⠀⠀⣠⡾⠁⠀\n` +
-                    `⠀⠀⠀⢀⡞⠁⢠⣄⠀⠀⠀⠀⠀⡿⠁⠀⠀\n` +
-                    `⠀⠀⠀⡞⠀⠀⠀⠙⢆⠀⠀⠀⡇⠀⠀⠀\n` +
-                    `⠀⠀⠀⡇⠀⠀⠀⢠⡞⠛⠲⢄⡇⠀⠀⠀\n` +
-                    `⠀⠀⠀⡇⠀⠘⠋⡇⠀⠀⠀⢸⡀⠀⠀⠀\n` +
-                    `⠀⠀⠀⠹⡄⠀⠀⢹⡄⠀⣀⡴⠃⠀⠀⠀\n` +
-                    `⠀⠀⠀⠀⠙⠦⠴⠋⠉⠉⠀⠀⠀⠀⠀`,
-                
-                "links": "Telegram - t.me/codermasochist\nGitHub - GitHub.com/codermasochist",
-                
-                "games": "CS2\nGenshin Impact\nStandoff",
-                
-                "modules": "Not implemented yet..."
-            };
-
-            input.addEventListener("keypress", function(event) {
-                if (event.key === "Enter") {
-                    event.preventDefault();
-                    let cmd = input.value.trim().toLowerCase();
-                    output.innerHTML += `\npidor@assa.lol:~$ ${cmd}`;
-                    input.value = "";
-
-                    if (cmd in commands) {
-                        output.innerHTML += `\n${commands[cmd]}`;
-                    } else {
-                        output.innerHTML += `\nCommand not found: ${cmd}`;
-                    }
-
-                    window.scrollTo(0, document.body.scrollHeight);
-                }
-            });
+            // Move to next
+            currentIndex = (currentIndex + 1) % aliases.length;
+            
+            // Show next
+            aliases[currentIndex].classList.add('active');
+        }
+        
+        // Start rotation
+        setInterval(rotateAlias, 2000);
+        
+        // Age calculation
+        function calculateAge() {
+            const birthDate = new Date(2008, 5, 30); // June is 5 (0-indexed)
+            const today = new Date();
+            const diff = today - birthDate;
+            
+            // Calculate age in years with decimals
+            const age = diff / (1000 * 60 * 60 * 24 * 365.25);
+            return age.toFixed(6);
+        }
+        
+        // Set calculated age
+        document.getElementById('age').textContent = calculateAge();
+        
+        // Add subtle glow effect to avatar on hover
+        const avatarFrame = document.querySelector('.avatar-frame');
+        avatarFrame.addEventListener('mouseover', () => {
+            avatarFrame.style.boxShadow = '0 0 30px var(--red)';
+        });
+        
+        avatarFrame.addEventListener('mouseout', () => {
+            avatarFrame.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.5)';
         });
     </script>
 </body>
